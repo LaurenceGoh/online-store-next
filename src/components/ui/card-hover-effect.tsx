@@ -3,35 +3,38 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
-import type { Product } from "@/types/types";
+import Stripe from "stripe";
 export const HoverEffect = ({
   items,
   className,
 }: {
-  items: Product[];
+  items: Stripe.Product[];
   className?: string;
 }) => {
   let [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
+  
   return (
     <div
       className={cn(
-        "grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3  py-10",
+        "grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3  py-10 gap-5",
         className
       )}
     >
-      {items.map((item, idx) => (
+      {items.map((item : Stripe.Product, idx : number) => (
         <Link
-          href="/"
+          href={{
+            pathname: `/${item.name}`,
+            query : { itemJSON: JSON.stringify(item) }
+          }}
           key={idx}
-          className="relative group  block p-2 h-full w-full"
+          className="relative group block p-2 h-full w-full border-white border-2 rounded-3xl "
           onMouseEnter={() => setHoveredIndex(idx)}
           onMouseLeave={() => setHoveredIndex(null)}
         >
           <AnimatePresence>
             {hoveredIndex === idx && (
               <motion.span
-                className="absolute inset-0 h-full w-full bg-neutral-200 dark:bg-slate-800/[0.8] block  rounded-3xl"
+                className="absolute inset-0 h-full w-full bg-neutral-200 dark:bg-slate-800/[0.8] block  rounded-2xl"
                 layoutId="hoverBackground"
                 initial={{ opacity: 0 }}
                 animate={{
@@ -47,12 +50,12 @@ export const HoverEffect = ({
           </AnimatePresence>
           <Card>
             <Image
-              src={item.thumbnail}
-              alt={item.title}
+              src={item.metadata.thumbnail}
+              alt={item.name}
               width="300"
               height="300"
             />
-            <CardTitle>{item.title}</CardTitle>
+            <CardTitle>{item.name}</CardTitle>
             <CardDescription>{item.description}</CardDescription>
           </Card>
         </Link>
